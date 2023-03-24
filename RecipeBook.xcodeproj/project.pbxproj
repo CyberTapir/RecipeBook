@@ -14,6 +14,7 @@
 		96A1D6E529CD58A0006A694F /* RecipeBookTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A1D6E429CD58A0006A694F /* RecipeBookTests.swift */; };
 		96A1D6EF29CD58A0006A694F /* RecipeBookUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A1D6EE29CD58A0006A694F /* RecipeBookUITests.swift */; };
 		96A1D6F129CD58A0006A694F /* RecipeBookUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A1D6F029CD58A0006A694F /* RecipeBookUITestsLaunchTests.swift */; };
+		96A1D6FE29CD595A006A694F /* Recipe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96A1D6FD29CD595A006A694F /* Recipe.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -45,6 +46,7 @@
 		96A1D6EA29CD58A0006A694F /* RecipeBookUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RecipeBookUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		96A1D6EE29CD58A0006A694F /* RecipeBookUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeBookUITests.swift; sourceTree = "<group>"; };
 		96A1D6F029CD58A0006A694F /* RecipeBookUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeBookUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		96A1D6FD29CD595A006A694F /* Recipe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Recipe.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -97,6 +99,7 @@
 			children = (
 				96A1D6D229CD589E006A694F /* RecipeBookApp.swift */,
 				96A1D6D429CD589E006A694F /* ContentView.swift */,
+				96A1D6FD29CD595A006A694F /* Recipe.swift */,
 				96A1D6D629CD58A0006A694F /* Assets.xcassets */,
 				96A1D6D829CD58A0006A694F /* RecipeBook.entitlements */,
 				96A1D6D929CD58A0006A694F /* Preview Content */,
@@ -259,6 +262,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				96A1D6FE29CD595A006A694F /* Recipe.swift in Sources */,
 				96A1D6D529CD589E006A694F /* ContentView.swift in Sources */,
 				96A1D6D329CD589E006A694F /* RecipeBookApp.swift in Sources */,
 			);
@@ -419,6 +423,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.food-and-drink";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -457,6 +462,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.food-and-drink";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
