@@ -1,18 +1,18 @@
 import SwiftUI
-
 struct RecipeView: View {
     let recipe: Recipe
-    
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 10) {
                 Text(recipe.name)
                     .font(.title)
                     .fontWeight(.bold)
-                Text("Serves: " + String(recipe.serves))
-                    .font(.body)
-                Text(String(recipe.timeToCook) + " minutes")
-                    .font(.body)
+                HStack{
+                    Text("Serves: " + String(recipe.serves))
+                        .font(.body)
+                    Text(String(recipe.timeToCook) + " minutes")
+                        .font(.body)
+                }
                 Text("Ingredients:")
                     .fontWeight(.bold)
                 ForEach(recipe.ingredients, id: \.self) { ingredient in
@@ -31,17 +31,47 @@ struct RecipeView: View {
 struct AddRecipeView: View {
     @Binding var recipes: [Recipe]
     @Environment(\.presentationMode) var presentationMode
+    
     @State private var name = ""
-    @State private var ingredients = ""
-    @State private var instructions = ""
-
+    @State private var cookTime = ""
+    @State private var servesHowMany = ""
+    
+    @State private var ingredients = [String]()
+    @State private var instructions = [String]()
+    
     var body: some View {
         NavigationView {
             Form {
                 Section(header: Text("Recipe Details")) {
                     TextField("Name", text: $name)
-                    TextField("Ingredients", text: $ingredients)
-                    TextField("Instructions", text: $instructions)
+                    TextField("Time to Cook", text: $cookTime)
+                        .keyboardType(.numberPad)
+                    TextField("Serves", text: $servesHowMany)
+                        .keyboardType(.numberPad)
+                }
+                
+                Section(header: Text("Ingredients")) {
+                    ForEach(0..<ingredients.count, id: \.self) { index in
+                        TextField("Ingredient \(index + 1)", text: $ingredients[index])
+                    }
+                    Button(action: {
+                        ingredients.append("")
+                    }, label: {
+                        Label("Add Ingredient", systemImage: "plus.circle")
+                    })
+                    .disabled(ingredients.count >= 10)
+                }
+                
+                Section(header: Text("Instructions")) {
+                    ForEach(0..<instructions.count, id: \.self) { index in
+                        TextField("Step \(index + 1)", text: $instructions[index])
+                    }
+                    Button(action: {
+                        instructions.append("")
+                    }, label: {
+                        Label("Add Step", systemImage: "plus.circle")
+                    })
+                    .disabled(instructions.count >= 20)
                 }
             }
             .navigationBarTitle("New Recipe")
@@ -52,10 +82,17 @@ struct AddRecipeView: View {
                             presentationMode.wrappedValue.dismiss()
                         }
                         Button("Save") {
-                            let newRecipe = Recipe(name: name, ingredients: ingredients.components(separatedBy: ","), instructions: instructions.components(separatedBy: ","), serves: 5, timeToCook: 4)
-                            recipes.append(newRecipe)
+                            let recipe = Recipe(
+                                name: name,
+                                ingredients: ingredients.filter { !$0.isEmpty },
+                                instructions: instructions.filter { !$0.isEmpty },
+                                serves: Int(servesHowMany) ?? 0,
+                                timeToCook: Int(cookTime) ?? 0
+                            )
+                            recipes.append(recipe)
                             presentationMode.wrappedValue.dismiss()
                         }
+                        .disabled(name.isEmpty || ingredients.isEmpty || instructions.isEmpty)
                     }
                 }
             }
@@ -70,33 +107,37 @@ struct ContentView: View {
     ]
     @State var isPresentingNewRecipe = false
     @State var newRecipeTitle = ""
+    private func deleteRecipe(at offsets: IndexSet){
+        recipes.remove(atOffsets: offsets)
+        
+    }
     var body: some View {
         NavigationView {
-                    List {
-                        ForEach(recipes, id: \.name) { recipe in
-                            NavigationLink(destination: RecipeView(recipe: recipe)) {
-                                Text(recipe.name)
-                            }
-                        }
+            List {
+                ForEach(recipes, id: \.name) { recipe in
+                    NavigationLink(destination: RecipeView(recipe: recipe)) {
+                        Text(recipe.name)
                     }
-                    .navigationTitle("Recipes")
-                    .navigationBarItems(trailing:
-                        Menu {
-                            Button(action: {
-                                // Handle adding a new recipe here
-                                self.isPresentingNewRecipe = true
-                            }) {
-                                Label("New Recipe", systemImage: "plus")
-                            }
-                        } label: {
-                            Image(systemName: "ellipsis.circle")
-                        }
-                    )
-                    .sheet(isPresented: $isPresentingNewRecipe) {
-                        AddRecipeView(recipes: $recipes)
-                        
-                    }
+                    //.onDelete(perform: deleteRecipe)
                 }
+            }
+            .navigationTitle("Recipes")
+            .navigationBarItems(trailing:
+                Menu {
+                    Button(action: {
+                        // Handle adding a new recipe here
+                        self.isPresentingNewRecipe = true
+                    }) {
+                        Label("New Recipe", systemImage: "plus")
+                    }
+                } label: {
+                    Image(systemName: "ellipsis.circle")
+                }
+            )
+            .sheet(isPresented: $isPresentingNewRecipe) {
+                AddRecipeView(recipes: $recipes)
+            }
+        }
     }
 }
 struct ContentView_Previews: PreviewProvider {
