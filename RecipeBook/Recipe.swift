@@ -1,9 +1,9 @@
 import Foundation
 import SwiftUI
-struct Recipe: Identifiable, Codable {
-    var id = UUID()
-    var title: String
-    var method: String
+struct Recipe {
+    let name: String
+    let ingredients: [String]
+    let instructions: [String]
     var serves: Int
     var timeToCook: Int
 }
