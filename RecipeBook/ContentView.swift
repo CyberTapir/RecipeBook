@@ -16,7 +16,10 @@ struct RecipeView: View {
                     Button(action: {
                         isPresentingEditRecipe = true
                     }) {
-                        Image(systemName: "pencil")
+                        Image(systemName: "pencil.circle.fill")
+                    }
+                    .sheet(isPresented: $isPresentingEditRecipe) {
+                        AddRecipeView(recipe: recipe, recipes: $recipes)
                     }
                 }
                 
@@ -58,6 +61,18 @@ struct AddRecipeView: View {
     @State private var servesHowMany = ""
     @State private var ingredients = [String]()
     @State private var instructions = [String]()
+    
+    init(recipe: Recipe? = nil, recipes: Binding<[Recipe]>) {
+        self._recipes = recipes
+        
+        if let recipe = recipe {
+            self._name = State(initialValue: recipe.name)
+            self._cookTime = State(initialValue: String(recipe.timeToCook))
+            self._servesHowMany = State(initialValue: String(recipe.serves))
+            self._ingredients = State(initialValue: recipe.ingredients)
+            self._instructions = State(initialValue: recipe.instructions)
+        }
+    }
     
     var body: some View {
         NavigationView {
@@ -109,11 +124,28 @@ struct AddRecipeView: View {
                             serves: Int(servesHowMany) ?? 0,
                             timeToCook: Int(cookTime) ?? 0
                         )
-                        recipes.append(recipe)
+                        if let index = recipes.firstIndex(where: { $0.name == name }) {
+                            recipes[index] = recipe
+                        } else {
+                            recipes.append(recipe)
+                        }
                         saveRecipes()
                         presentationMode.wrappedValue.dismiss()
                     }) {
-                        Text("Save Recipe")
+                        Text(recipes != nil ? "Update Recipe" : "Save Recipe")
+                    }
+
+                    Spacer()
+                    Button(action: {
+                        if let index = recipes.firstIndex(where: { $0.name == name }) {
+                            recipes.remove(at: index)
+                            saveRecipes()
+                            presentationMode.wrappedValue.dismiss()
+                            //presentationMode.self.dismiss()
+                        }
+                    }){
+                        Text("Delete recipe")
+                            .foregroundColor(.red)
                     }
                 }
             }
@@ -133,6 +165,7 @@ struct ContentView: View {
         Recipe(name: "Spaghetti Bolognese", ingredients: ["500g spaghetti", "400g canned tomatoes", "1 onion", "2 garlic cloves", "500g minced beef"], instructions: ["Cook the spaghetti according to the package instructions", "Chop the onion and garlic and fry in a pan", "Add the minced beef and cook until browned", "Add the canned tomatoes and simmer for 10 minutes", "Serve the bolognese sauce over the spaghetti"], serves: 5, timeToCook: 45),
         Recipe(name: "Chicken Curry", ingredients: ["1 onion", "2 garlic cloves", "500g chicken breast", "1 can of coconut milk", "2 tbsp curry powder"], instructions: ["Chop the onion and garlic and fry in a pan", "Cut the chicken into small pieces and add to the pan", "Add the curry powder and fry for a few minutes", "Add the coconut milk and simmer for 15-20 minutes", "Serve with rice"], serves: 5, timeToCook: 45),
     ]
+    //@Binding var recipes: [Recipe]
     @State var isPresentingNewRecipe = false
     @State var newRecipeTitle = ""
     
@@ -159,6 +192,7 @@ struct ContentView: View {
             .navigationBarItems(
                 trailing: Button(action: {
                     isPresentingNewRecipe = true
+                    //AddRecipeView(name: name, ingredients: $recipes.ingredients, instructions: $recipes.instructions, serves: $recipes.serves, timeToCook: $recipes.timeToCook)
                 }) {
                     Image(systemName: "plus.circle.fill")
                 }
@@ -176,5 +210,3 @@ struct ContentView: View {
         }
     }
 }
-
-
