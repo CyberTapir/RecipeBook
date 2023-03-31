@@ -1,5 +1,5 @@
 import SwiftUI
-
+import UIKit
 struct RecipeView: View {
     let recipe: Recipe
     @Binding var recipes: [Recipe]
@@ -51,8 +51,32 @@ struct RecipeView: View {
         }
     }
 }
-
-
+struct SearchBar: View {
+    @Binding var text: String
+    
+    var body: some View {
+        HStack {
+            TextField("Search", text: $text)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 8)
+                .background(Color(.systemGray5))
+                .cornerRadius(8)
+            Button(action: {
+                withAnimation {
+                    text = ""
+                }
+            }) {
+                Image(systemName: "xmark.circle.fill")
+                    .foregroundColor(.gray)
+            }
+            .padding(.trailing, 8)
+            .opacity(text.isEmpty ? 0 : 1)
+        }
+        .padding(.horizontal, 15)
+        .padding(.vertical, 10)
+        .background(Color(.systemGray6))
+    }
+}
 struct AddRecipeView: View {
     @Binding var recipes: [Recipe]
     @Environment(\.presentationMode) var presentationMode
@@ -144,7 +168,7 @@ struct AddRecipeView: View {
                             //presentationMode.self.dismiss()
                         }
                     }){
-                        Text("Delete recipe")
+                        Text("Delete Recipe")
                             .foregroundColor(.red)
                     }
                 }
@@ -165,6 +189,14 @@ struct ContentView: View {
         Recipe(name: "Spaghetti Bolognese", ingredients: ["500g spaghetti", "400g canned tomatoes", "1 onion", "2 garlic cloves", "500g minced beef"], instructions: ["Cook the spaghetti according to the package instructions", "Chop the onion and garlic and fry in a pan", "Add the minced beef and cook until browned", "Add the canned tomatoes and simmer for 10 minutes", "Serve the bolognese sauce over the spaghetti"], serves: 5, timeToCook: 45),
         Recipe(name: "Chicken Curry", ingredients: ["1 onion", "2 garlic cloves", "500g chicken breast", "1 can of coconut milk", "2 tbsp curry powder"], instructions: ["Chop the onion and garlic and fry in a pan", "Cut the chicken into small pieces and add to the pan", "Add the curry powder and fry for a few minutes", "Add the coconut milk and simmer for 15-20 minutes", "Serve with rice"], serves: 5, timeToCook: 45),
     ]
+    @State private var searchText = ""
+    var filteredRecipes: [Recipe] {
+        if searchText.isEmpty {
+            return recipes
+        } else {
+            return recipes.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
+        }
+    }
     //@Binding var recipes: [Recipe]
     @State var isPresentingNewRecipe = false
     @State var newRecipeTitle = ""
@@ -182,13 +214,21 @@ struct ContentView: View {
     
     var body: some View {
         NavigationView {
+            VStack {
+                SearchBar(text: $searchText)
+                List(filteredRecipes) { recipe in
+                    NavigationLink(destination: RecipeView(recipe: recipe, recipes: $recipes)) {
+                        Text(recipe.name)
+                    }
+                }
+            }
             List {
                 ForEach(recipes) { recipe in
                     RecipeView(recipe: recipe, recipes: $recipes)
                 }
                 .onDelete(perform: deleteRecipe)
             }
-            .navigationBarTitle("Recipes")
+            
             .navigationBarItems(
                 trailing: Button(action: {
                     isPresentingNewRecipe = true
