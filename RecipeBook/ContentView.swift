@@ -4,7 +4,6 @@ struct RecipeView: View {
     let recipe: Recipe
     @Binding var recipes: [Recipe]
     @State private var isPresentingEditRecipe = false
-    
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 10) {
@@ -22,24 +21,19 @@ struct RecipeView: View {
                         AddRecipeView(recipe: recipe, recipes: $recipes)
                     }
                 }
-                
                 HStack{
                     Text("Serves " + String(recipe.serves) + ",")
                         .font(.body)
                     Text(String(recipe.timeToCook) + " minutes cooking time")
                         .font(.body)
                 }
-                
                 Text("Ingredients:")
                     .fontWeight(.bold)
-                
                 ForEach(recipe.ingredients, id: \.self) { ingredient in
                     Text("- \(ingredient)")
                 }
-                
                 Text("Instructions:")
                     .fontWeight(.bold)
-                
                 ForEach(recipe.instructions, id: \.self) { step in
                     Text("- \(step)")
                 }
@@ -53,7 +47,6 @@ struct RecipeView: View {
 }
 struct SearchBar: View {
     @Binding var text: String
-    
     var body: some View {
         HStack {
             TextField("Search", text: $text)
@@ -85,10 +78,8 @@ struct AddRecipeView: View {
     @State private var servesHowMany = ""
     @State private var ingredients = [String]()
     @State private var instructions = [String]()
-    
     init(recipe: Recipe? = nil, recipes: Binding<[Recipe]>) {
         self._recipes = recipes
-        
         if let recipe = recipe {
             self._name = State(initialValue: recipe.name)
             self._cookTime = State(initialValue: String(recipe.timeToCook))
@@ -97,7 +88,6 @@ struct AddRecipeView: View {
             self._instructions = State(initialValue: recipe.instructions)
         }
     }
-    
     var body: some View {
         NavigationView {
             Form {
@@ -108,7 +98,6 @@ struct AddRecipeView: View {
                     TextField("Serves", text: $servesHowMany)
                         .keyboardType(.numberPad)
                 }
-                
                 Section(header: Text("Ingredients")) {
                     ForEach(0..<ingredients.count, id: \.self) { index in
                         HStack {
@@ -127,7 +116,6 @@ struct AddRecipeView: View {
                         Label("Add Ingredient", systemImage: "plus")
                     }
                 }
-                
                 Section(header: Text("Instructions")) {
                     ForEach(0..<instructions.count, id: \.self) { index in
                         TextField("Step \(index+1)", text: $instructions[index])
@@ -138,7 +126,6 @@ struct AddRecipeView: View {
                         Label("Add Step", systemImage: "plus")
                     }
                 }
-                
                 Section {
                     Button(action: {
                         let recipe = Recipe(
@@ -158,7 +145,6 @@ struct AddRecipeView: View {
                     }) {
                         Text(recipes != nil ? "Update Recipe" : "Save Recipe")
                     }
-
                     Spacer()
                     Button(action: {
                         if let index = recipes.firstIndex(where: { $0.name == name }) {
@@ -176,18 +162,16 @@ struct AddRecipeView: View {
             .navigationTitle("Add Recipe")
         }
     }
-    
     private func saveRecipes() {
         if let data = try? JSONEncoder().encode(recipes) {
             UserDefaults.standard.set(data, forKey: "recipes")
         }
     }
 }
-
 struct ContentView: View {
     @State var recipes = [
         Recipe(name: "Spaghetti Bolognese", ingredients: ["500g spaghetti", "400g canned tomatoes", "1 onion", "2 garlic cloves", "500g minced beef"], instructions: ["Cook the spaghetti according to the package instructions", "Chop the onion and garlic and fry in a pan", "Add the minced beef and cook until browned", "Add the canned tomatoes and simmer for 10 minutes", "Serve the bolognese sauce over the spaghetti"], serves: 5, timeToCook: 45),
-        Recipe(name: "Chicken Curry", ingredients: ["1 onion", "2 garlic cloves", "500g chicken breast", "1 can of coconut milk", "2 tbsp curry powder"], instructions: ["Chop the onion and garlic and fry in a pan", "Cut the chicken into small pieces and add to the pan", "Add the curry powder and fry for a few minutes", "Add the coconut milk and simmer for 15-20 minutes", "Serve with rice"], serves: 5, timeToCook: 45),
+        Recipe(name: "Chicken Curry", ingredients: ["1 onion", "2 garlic cloves", "500g chicken breast", "1 can of coconut milk"], instructions: ["Chop the onion and garlic and fry in a pan", "Add the chicken and cook until browned", "Add the coconut milk and simmer for 20 minutes", "Serve over rice"], serves: 4, timeToCook: 30)
     ]
     @State private var searchText = ""
     var filteredRecipes: [Recipe] {
@@ -197,21 +181,6 @@ struct ContentView: View {
             return recipes.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
         }
     }
-    //@Binding var recipes: [Recipe]
-    @State var isPresentingNewRecipe = false
-    @State var newRecipeTitle = ""
-    
-    private func deleteRecipe(at offsets: IndexSet){
-        recipes.remove(atOffsets: offsets)
-    }
-    
-    private func loadRecipes() {
-        if let data = UserDefaults.standard.data(forKey: "recipes"),
-           let storedRecipes = try? JSONDecoder().decode([Recipe].self, from: data) {
-            recipes = storedRecipes
-        }
-    }
-    
     var body: some View {
         NavigationView {
             VStack {
@@ -222,31 +191,13 @@ struct ContentView: View {
                     }
                 }
             }
-            List {
-                ForEach(recipes) { recipe in
-                    RecipeView(recipe: recipe, recipes: $recipes)
-                }
-                .onDelete(perform: deleteRecipe)
-            }
-            
-            .navigationBarItems(
-                trailing: Button(action: {
-                    isPresentingNewRecipe = true
-                    //AddRecipeView(name: name, ingredients: $recipes.ingredients, instructions: $recipes.instructions, serves: $recipes.serves, timeToCook: $recipes.timeToCook)
-                }) {
-                    Image(systemName: "plus.circle.fill")
-                }
-            )
-            .sheet(isPresented: $isPresentingNewRecipe) {
-                AddRecipeView(recipes: $recipes)
-            }
-            .onAppear(perform: loadRecipes)
-        }
-    }
-    
-    private func saveRecipes() {
-        if let data = try? JSONEncoder().encode(recipes) {
-            UserDefaults.standard.set(data, forKey: "recipes")
+            .navigationTitle("Recipes")
+            .navigationBarItems(trailing: Button(action: {
+                let recipe = Recipe(name: "", ingredients: [], instructions: [], serves: 0, timeToCook: 0)
+                recipes.append(recipe)
+            }) {
+                Image(systemName: "plus")
+            })
         }
     }
 }
